@@ -11,7 +11,7 @@ export function addTraceMetrics({
   value,
 }: TraceMetricsParams) {
   const query = db.query(
-    `INSERT INTO ${tableNameMetric} (traceId, name, type, value) VALUES (:traceId, :name, :type, :value)`,
+    `INSERT INTO ${tableNameMetric} (traceId, name, type, value) VALUES ($traceId, $name, $type, $value)`,
   );
-  query.run({ traceId, name, type, value });
+  query.run({ $traceId: traceId, $name: name, $type: type, $value: value });
 }

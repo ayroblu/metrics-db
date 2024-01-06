@@ -6,7 +6,12 @@ const db = getDb();
 
 export function addTrace({ name, traceId, startTime, endTime }: TraceParams) {
   const query = db.query(
-    `INSERT OR REPLACE INTO ${tableName} (traceId, name, startTime, endTime) VALUES (:traceId, :name, :startTime :endTime)`,
+    `INSERT OR REPLACE INTO ${tableName} (traceId, name, startTime, endTime) VALUES ($traceId, $name, $startTime, $endTime)`,
   );
-  query.run({ traceId, name, startTime, endTime });
+  query.run({
+    $traceId: traceId,
+    $name: name,
+    $startTime: startTime,
+    $endTime: endTime,
+  });
 }

@@ -3,7 +3,7 @@ import { tableName, tableNameAttr, tableNameMetric } from "./constants";
 import path from "path";
 
 const dbPath = path.resolve(
-  import.meta.path,
+  path.dirname(import.meta.path),
   "..",
   "..",
   "observability.sqlite",
@@ -11,14 +11,14 @@ const dbPath = path.resolve(
 
 export function getDb(): Database {
   const db = new Database(dbPath);
-  db.exec("PRAGMA journal_mode = WAL;");
+  // db.exec("PRAGMA journal_mode = WAL;");
   createIfNotExists(db);
   return db;
 }
 function createIfNotExists(db: Database): void {
   const tableExists = db
     .query(
-      `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}`,
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}'`,
     )
     .get();
   if (tableExists) {
@@ -34,10 +34,10 @@ function createIfNotExists(db: Database): void {
     `CREATE TABLE ${tableNameAttr}(traceId TEXT, name TEXT, value TEXT)`,
     `CREATE INDEX ${tableNameAttr}_traceId_index ON ${tableNameAttr}(traceId)`,
     `CREATE INDEX ${tableNameAttr}_name_index ON ${tableNameAttr}(name)`,
-    `CREATE UNQUE INDEX ${tableNameAttr}_traceId_name_index ON ${tableNameAttr}(traceId, name)`,
+    `CREATE UNIQUE INDEX ${tableNameAttr}_traceId_name_index ON ${tableNameAttr}(traceId, name)`,
     // No value index cause we assume that we will always filter by atleast name or traceId
 
-    `CREATE TABLE ${tableNameMetric}_metric(traceId TEXT, name TEXT, type Text, value TEXT)`,
+    `CREATE TABLE ${tableNameMetric}(traceId TEXT, name TEXT, type Text, value TEXT)`,
     `CREATE INDEX ${tableNameMetric}_metric_traceId_index ON ${tableNameMetric}(traceId)`,
     `CREATE INDEX ${tableNameMetric}_metric_name_index ON ${tableNameMetric}(name)`,
     // No type or value index cause we assume that we will always filter by atleast name or traceId
